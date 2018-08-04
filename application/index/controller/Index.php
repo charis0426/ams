@@ -13,7 +13,7 @@ class Index
      */
     public function login()
     {
-        return "欢迎登陆1";
+        return "欢迎登陆";
     }
     /*
      * 测试查询方法
