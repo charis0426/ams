@@ -6,14 +6,7 @@ use app\index\model\FileResourceTag as file;
 class Index
 {
 
-    /*
-     * 财务首页方法
-     *
-     */
-    public function index()
-    {
-       return "财务管理系统";
-    }
+   
     /*
      * 财务登陆方法
      *
