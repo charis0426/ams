@@ -1,7 +1,7 @@
 <?php
 namespace app\index\controller;
-use app\index\model\Sent as sentModel;
-class Recived
+use app\index\model\Collect as collectModel ;
+class Collect
 {
 	/*
      * 送出礼金检索
@@ -9,7 +9,7 @@ class Recived
      */
  public function query()
     {
-        $res=new sentModel();
+        $res=new collectModel();
         return json_encode($res->query());
     }
     /*
