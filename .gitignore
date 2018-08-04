@@ -1,5 +1,6 @@
-.idea
-composer.lock
 *.log
+.idea
+application/database.php
+composer.lock
 thinkphp
 application/database.php
