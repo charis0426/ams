@@ -3,9 +3,19 @@ namespace app\index\controller;
 use app\index\model\FileResourceTag;
 use app\index\model\Index as indexModel;
 use app\index\model\FileResourceTag as file;
-class Index
+use think\Session;
+class Index extends Base
 {
 
+    protected $indexModel;
+    /*
+     * 构造函数
+     *
+     */
+    public function _initialize(){
+        parent::initialize();
+        $this->indexModel=new indexModel();
+    }
    
     /*
      * 财务登陆方法
@@ -13,7 +23,48 @@ class Index
      */
     public function login()
     {
-        return "欢迎登陆";
+        //判断方法类型
+        if(IS_POST){
+            //接受json
+            $res_data=request()->post();
+            if(isset($res_data['data'])&& $res_data['data']!=""){
+              $data=$res_data['data'];
+            //判断用户名和密码是否为空
+              if(!isset($data['userName'])){
+                    return returnJson("1006");
+              }
+              else{
+                   $userName = $data['userName'];
+              }
+              if(!isset($data['password'])){
+                    return returnJson("1007");
+              }
+              else{
+                   $password = $data['password'];
+              }
+              //调用model验证方法
+              $res = $this->indexModel->checkLogin($userName);
+              if($res != null){
+                //验证密码是否正确
+                if($password == $res['password']){
+                    //保存token
+                    Session::set($password,$res['id']);
+                    //返回json
+                    $map['id']=$res['id'];
+                    $map['token']=$password;
+                    return returnJson("2000",$map);
+                }
+              }
+              return json_encode($res);
+
+
+            }else{
+                return returnJson("2001");
+            }
+        }
+        else{
+            return returnJson("2002");
+        }
     }
     /*
      * 测试查询方法

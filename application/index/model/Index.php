@@ -8,7 +8,17 @@ class Index extends Model
     protected $table='user';
 
   public  function query(){
-      $data=Db::name($this->table)->select();
+      $data=Db::table($this->table)->select();
+      return $data;
+  }
+  //根据id查询用户信息
+  public function queryById($id){
+  	  $data=DB::table($this->table)->where('id',$id)->find();
+      return $data;
+  }
+  //检测登录
+  public function checkLogin($userName){
+      $data=DB::table($this->table)->where('userName',$userName)->find();
       return $data;
   }
 }

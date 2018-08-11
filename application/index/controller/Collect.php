@@ -2,7 +2,7 @@
 namespace app\index\controller;
 use app\index\model\Collect as collectModel ;
 use think\Controller;
-class Collect extends Controller
+class Collect extends BaseCheckAuth
 {
     protected $collectModel;
     /*
@@ -10,6 +10,7 @@ class Collect extends Controller
      *
      */
     public function _initialize(){
+        parent::initialize();
         $this->collectModel=new collectModel();
     }
 	/*
@@ -34,7 +35,7 @@ class Collect extends Controller
                 }
                 //判断event是否存在
                 if(!isset($data['event'])){
-                    return jsonJson("1002");
+                    return returnJson("1002");
                 }else{
                     $new_data['event']=$data['event'];
                 }
