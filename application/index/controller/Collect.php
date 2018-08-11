@@ -28,41 +28,31 @@ class Collect extends Controller
                 $data=$res_data['data'];
                 //判断name是否存在
                 if(!isset($data['name'])){
-                    $map['errCode']=1003;
-                    $map['errMsg']='姓名不能为空';
-                    return json_encode($data['name']);
+                    return returnJson("1001");
                 }else{
                     $new_data['name']=$data['name'];
                 }
                 //判断event是否存在
                 if(!isset($data['event'])){
-                    $map['errCode']=1004;
-                    $map['errMsg']='事件不能为空';
-                    return json_encode($data['event']);
+                    return jsonJson("1002");
                 }else{
                     $new_data['event']=$data['event'];
                 }
                 //判断scene是否存在
                 if(!isset($data['scene'])){
-                    $map['errCode']=1005;
-                    $map['errMsg']='现场不能为空';
-                    return json_encode($data['scene']);
+                    return returnJson("1003");
                 }else{
                     $new_data['scene']=$data['scene'];
                 }
                 //判断money是否存在
                 if(!isset($data['money'])){
-                    $map['errCode']=1006;
-                    $map['errMsg']='金额不能为空';
-                    return json_encode($data['money']);
+                    return returnJson("1004");
                 }else{
                     $new_data['money']=$data['money'];
                 }
                 //判断remark是否存在
                 if(!isset($data['remark'])||$data['remark']==''){
-                    $map['errCode']=1007;
-                    $map['errMsg']='备注不能为空';
-                    return json_encode($data['remark']);
+                    return returnJson("1005");
                 }else{
                     $new_data['remark']=$data['remark'];
                 }
@@ -72,15 +62,11 @@ class Collect extends Controller
 
             }
             else{
-                $map['errCode']=1002;
-                $map['errMsg']='请求参数错误';
-                return json_encode($map);
+                return returnJson("2001");
             }
 
         }else{
-            $map['errCode']=1001;
-            $map['errMsg']='请求方法错误';
-            return json_encode($map);
+            return returnJson("2002");
         }
     }
 
