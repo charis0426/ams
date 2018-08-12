@@ -23,28 +23,22 @@ class Index extends Base
      */
     public function login()
     {
-        //判断方法类型
-        if(IS_POST){
-            //接受json
-            $res_data=request()->post();
-            if(isset($res_data['data'])&& $res_data['data']!=""){
-              $data=$res_data['data'];
+        //接受json
+        $res_data=request()->post();
+        if(checkData($res_data,'data')){
+            $data=$res_data['data'];
             //判断用户名和密码是否为空
-              if(!isset($data['userName'])){
-                    return returnJson("1006");
-              }
-              else{
-                   $userName = $data['userName'];
-              }
-              if(!isset($data['password'])){
-                    return returnJson("1007");
-              }
-              else{
-                   $password = $data['password'];
-              }
-              //调用model验证方法
-              $res = $this->indexModel->checkLogin($userName);
-              if($res != null){
+            if(!checkData($data,'userName')){
+                return returnJson("1006");
+            }
+            $userName = $data['userName'];
+            if(!checkData($data,'password')){
+                return returnJson("1007");
+            }
+            $password = $data['password'];
+            //调用model验证方法
+             $res = $this->indexModel->checkLogin($userName);
+            if($res != null){
                 //验证密码是否正确
                 if($password == $res['password']){
                     //保存token
@@ -55,17 +49,10 @@ class Index extends Base
                     return returnJson("2000",$map);
                 }
                 return returnJson("2003");
-              }
-              return returnJson("2004");
-
-
-            }else{
-                return returnJson("2001");
             }
+            return returnJson("2004");
         }
-        else{
-            return returnJson("2002");
-        }
+        return returnJson("2001");  
     }
 
     /*
@@ -75,7 +62,17 @@ class Index extends Base
      */
     public function register()
     {
-     # code...
+        //接受json数据
+        $res_data=request()->post();
+        if(isset($res_data['data'])&& $res_data['data']!=""){
+            $data=$res_data['data'];
+            //判断注册用户名是否为空
+            if(!isset($data['userName'])){
+                return false;
+            }
+
+        }
+        return returnJson("2001");
     }
 
 

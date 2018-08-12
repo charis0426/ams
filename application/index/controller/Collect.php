@@ -23,38 +23,33 @@ class Collect extends BaseCheckAuth
         $res_data=request()->post();
         //return json_encode($res_data);
         //判断是否有data数据,判断数据是否为空
-        if(isset($res_data['data'])&& $res_data['data']!=""){
+        if(!checkData($res_data,'data')){
             $data=$res_data['data'];
             //判断name是否存在
-            if(!isset($data['name'])){
+            if(!checkData($data,'name')){
                 return returnJson("1001");
-            }else{
-                $new_data['name']=$data['name'];
             }
+            $new_data['name']=$data['name'];
             //判断event是否存在
-            if(!isset($data['event'])){
+            if(!checkData($data,'event')){
                 return returnJson("1002");
-            }else{
-                $new_data['event']=$data['event'];
             }
+            $new_data['event']=$data['event'];
             //判断scene是否存在
-            if(!isset($data['scene'])){
+            if(!checkData($data,'scene')){
                 return returnJson("1003");
-            }else{
-                $new_data['scene']=$data['scene'];
             }
+            $new_data['scene']=$data['scene'];
             //判断money是否存在
-            if(!isset($data['money'])){
+            if(!checkData($data,'money')){
                 return returnJson("1004");
-            }else{
-                $new_data['money']=$data['money'];
             }
+            $new_data['money']=$data['money'];
             //判断remark是否存在
-            if(!isset($data['remark'])||$data['remark']==''){
+            if(!checkData($data,'remark',1)){
                 return returnJson("1005");
-            }else{
-                $new_data['remark']=$data['remark'];
             }
+            $new_data['remark']=$data['remark'];
             //调用model层add方法插入数据
             $res=$this->collectModel->add($new_data);
             return json_encode($res);
@@ -64,7 +59,7 @@ class Collect extends BaseCheckAuth
             return returnJson("2001");
         }
 
-        }
+    }
     
 
 }

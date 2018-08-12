@@ -9,7 +9,7 @@ use think\Exception;
 /**
 * 
 */
-class CheckAuthP
+class CheckAuth
 {
     
     //绑定到CheckAuth标签，用于检测Session以用来判断用户是否登录
