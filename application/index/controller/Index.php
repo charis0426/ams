@@ -54,8 +54,9 @@ class Index extends Base
                     $map['token']=$password;
                     return returnJson("2000",$map);
                 }
+                return returnJson("2003");
               }
-              return json_encode($res);
+              return returnJson("2004");
 
 
             }else{
@@ -66,6 +67,21 @@ class Index extends Base
             return returnJson("2002");
         }
     }
+
+    /*
+     *
+     *注册方法
+     * 
+     */
+    public function register()
+    {
+     # code...
+    }
+
+
+
+
+
     /*
      * 测试查询方法
      *
