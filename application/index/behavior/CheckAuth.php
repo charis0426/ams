@@ -5,6 +5,8 @@ use think\Controller;
 use think\Request;
 use think\Session;
 use think\Exception;
+use firebase\JWT\JWT;
+use app\env;
 
 /**
 * 
@@ -16,17 +18,33 @@ class CheckAuth
     public function run(&$params){
     	//获取token和用户id
     	$token = request()->header('x-Tokend');
-    	$id = request()->header('x-Adminid');
+        
         //验证请求方法是否合法
         if(!IS_POST){
             exit(returnJson("2002"));
         }
-        if(Session::has($token) == null || Session::get($token)!=$id){
+        if($token == ""){
+            exit(returnJson("403"));
+        }
+        $decode = $this->decodeToken($token);
+        if(!is_object($decode)){
             //验证失败返回消息
             exit(returnJson("403"));
-
-    	}
+    	}else{
+            $arr = json_decode(json_encode($decode), true);
+            return $arr;
+        }
         
+    }
+    //解密token
+    public function decodeToken($token){
+        $key = env::config['key'];
+        try {
+            $decoded = JWT::decode($token, $key, array('HS256'));
+        } catch (\Exception $e) {
+            $decoded = 0;
+        }
+        return $decoded;
     }
 }
 

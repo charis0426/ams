@@ -40,12 +40,11 @@ class Index extends Base
              $res = $this->indexModel->checkLogin($userName);
             if($res != null){
                 //验证密码是否正确
-                if($password == $res['password']){
-                    //保存token
-                    Session::set($password,$res['id']);
+                if(password_verify($password, $res['password'])){
+                    //生成token
+                    $token = parent::createToken($res);
                     //返回json
-                    $map['id']=$res['id'];
-                    $map['token']=$password;
+                    $map['token'] = $token;
                     return returnJson("2000",$map);
                 }
                 return returnJson("2003");
@@ -64,12 +63,30 @@ class Index extends Base
     {
         //接受json数据
         $res_data=request()->post();
-        if(isset($res_data['data'])&& $res_data['data']!=""){
+        if(checkData($res_data,'data')){
             $data=$res_data['data'];
             //判断注册用户名是否为空
-            if(!isset($data['userName'])){
-                return false;
+            if(!checkData($data,'userName')){
+                return returnJson("1008");
             }
+            $new_data['userName'] = $data['userName'];
+            //判断注册密码是否为空
+            if(!checkData($data,'password')){
+                return returnJson("1009");
+            }
+            $new_data['password'] = parent::getPassHash($data['password']);
+            //判断注册电话是否为空
+            if(!checkData($data,'phone')){
+                return returnJson("1010");
+            }
+            $new_data['phone'] = $data['phone'];
+            //获取当前时间戳
+            $new_data['lastLoginTime'] = time();   
+            //return json_encode($new_data);
+            //调用model数据库添加方法
+            $res=$this->indexModel->add($new_data);
+
+            return json_encode($res);
 
         }
         return returnJson("2001");

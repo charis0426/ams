@@ -23,7 +23,7 @@ class Collect extends BaseCheckAuth
         $res_data=request()->post();
         //return json_encode($res_data);
         //判断是否有data数据,判断数据是否为空
-        if(!checkData($res_data,'data')){
+        if(checkData($res_data,'data')){
             $data=$res_data['data'];
             //判断name是否存在
             if(!checkData($data,'name')){

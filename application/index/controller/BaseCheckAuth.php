@@ -15,13 +15,11 @@ class BaseCheckAuth extends Base
 		parent::initialize();
 		//监听登录的钩子
 		$params = [];
-		Hook::listen('checkAuth',$params);
+		$adminInfo = Hook::listen('checkAuth',$params);
 		//验证成功后 吧登录信息副给info
-		$id = request()->header('X-Adminid');
-		$indexModel = new Index();
-		$loginInfo = $indexModel->queryById($id);
-		$this->adminInfo = $loginInfo;
+		$this->adminInfo = $adminInfo;
 	}
+
 
 
 
