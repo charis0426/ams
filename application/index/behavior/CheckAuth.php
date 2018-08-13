@@ -6,7 +6,7 @@ use think\Request;
 use think\Session;
 use think\Exception;
 use firebase\JWT\JWT;
-use app\env;
+use think\Config;
 
 /**
 * 
@@ -38,7 +38,8 @@ class CheckAuth
     }
     //解密token
     public function decodeToken($token){
-        $key = env::config['key'];
+        $key = Config::get("render.key");
+        //exit(json_encode($key));
         try {
             $decoded = JWT::decode($token, $key, array('HS256'));
         } catch (\Exception $e) {

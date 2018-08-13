@@ -1,7 +1,7 @@
 <?php
 namespace app;
 /**
- * 后台错误代码
+ * 后台参数配置
  */
 class env
 {
