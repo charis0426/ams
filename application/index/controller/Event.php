@@ -30,8 +30,8 @@ class Event extends BaseCheckAuth
                 $page = 1;
             }
             $new_data['page'] = $data['page'];
-            //判断查询name的关键字
-            if(!checkData($data,'name')){
+            //判断查询name的关键字可以为空字符串
+            if(!checkData($data,'name',1)){
                 return returnJson("10013");
             }
             $new_data['name'] = $data['name'];
