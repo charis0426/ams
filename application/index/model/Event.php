@@ -11,11 +11,20 @@ class Event extends Model
       $res=Db::name($this->table)->where('name','like','%'.$data['name'].'%')->page($data['page'].','.$data['pageSize'])->select(); 
       return $res;
   }
-  /**
-   * 创建时间
+  /*
+   *
+   * 创建事件
    */
   public function add($data){
   	$res = DB::table($this->table)->insert($data);
+  	return $res;
+  }
+  /*
+   *
+   * 创建事件
+   */
+  public function updateEvent($data){
+  	$res = DB::table($this->table)->update($data);
   	return $res;
   }
 }

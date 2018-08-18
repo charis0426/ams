@@ -13,7 +13,6 @@ use think\Config;
 
 class Base extends Controller
 {
-    protected $key="ams19921018";
     public function initialize()
     {
        // parent::initialize();
