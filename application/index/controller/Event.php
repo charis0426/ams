@@ -1,6 +1,7 @@
 <?php
 namespace app\index\controller;
 use app\index\model\Event as eventModel;
+use think\Log;
 class Event extends BaseCheckAuth
 {
 	protected $eventModel;
@@ -26,8 +27,39 @@ class Event extends BaseCheckAuth
      */
  public function add()
     {
-       
-        return json_encode($this->eventModel->query());
+        //接受json
+        $res_data=request()->post();
+        //判断是否有data数据,判断数据是否为空
+        if(checkData($res_data,'data')){
+            $data=$res_data['data'];
+            //判断事件名称是否为空
+            if(!checkData($data,'name')){
+                return returnJson("10011");
+            }
+            $new_data['name'] = $data['name'];
+            //判断时间日期是否为空
+            if(!checkData($data,'date')){
+                return returnJson("10012");
+            }
+            $new_data['date'] = strtotime($data['date']);
+            //判断备注是否合法
+            if(!checkData($data,'info',1)){
+                return returnJson("1005");
+            }
+            $new_data['info']=$data['info'];
+            //获取当前创建时间
+            $new_data['createTime'] = time();
+            //插入数据
+            $res=$this->eventModel->add($new_data);
+            if($res==1){
+                return returnJson("2000");
+            }
+            //写日志记录
+            Log::notice('添加事件：'.$new_data.' 异常：插入失败');
+            return returnJson("3001");
+        }
+        return returnJson("2001");  
+        //return json_encode($this->eventModel->query());
     }
 
 }

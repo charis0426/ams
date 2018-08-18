@@ -26,4 +26,9 @@ class Index extends Model
     $res = DB::table($this->table)->insert($data);
     return $res;
   }
+  //更新数据库登录时间
+  public function updateLoginInfo($time,$id){
+    $res = DB::table($this->table)->where('id', $id)->update(['lastLoginTime' => $time]);
+    return $res;
+  }
 }

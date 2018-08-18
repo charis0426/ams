@@ -4,6 +4,7 @@ use app\index\model\FileResourceTag;
 use app\index\model\Index as indexModel;
 use app\index\model\FileResourceTag as file;
 use think\Session;
+use think\Log;
 class Index extends Base
 {
 
@@ -41,6 +42,12 @@ class Index extends Base
             if($res != null){
                 //验证密码是否正确
                 if(password_verify($password, $res['password'])){
+                    //更新数据库登录时间
+                    $update_res = $this->indexModel->updateLoginInfo(time(),$res['id']);
+                    if($update_res != 1){
+                        //写日志记录没有更新
+                        Log::notice('用户：'.$userName.' 异常：登录时间没有更新');
+                    }
                     //生成token
                     $token = parent::createToken($res);
                     //返回json
@@ -81,7 +88,8 @@ class Index extends Base
             }
             $new_data['phone'] = $data['phone'];
             //获取当前时间戳
-            $new_data['lastLoginTime'] = time();   
+            $new_data['lastLoginTime'] = time();  
+            $new_data['createTime'] = time();
             //return json_encode($new_data);
             //调用model数据库添加方法
             $res=$this->indexModel->add($new_data);

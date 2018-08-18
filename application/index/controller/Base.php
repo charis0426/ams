@@ -3,7 +3,7 @@ namespace app\index\controller;
 
 use think\Controller;
 use firebase\JWT\JWT;
-use app\env;
+use think\Config;
 
 /*
  *
@@ -37,7 +37,7 @@ class Base extends Controller
 	 * 
 	 */
 	public function createToken($data){
-		$key = env::config['key'];
+		$key = Config::get("render.key");
 		$token = array(
 		'id' => $data['id'],
 		'userName' => $data['userName'],
