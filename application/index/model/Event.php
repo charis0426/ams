@@ -7,9 +7,9 @@ class Event extends Model
 {
     protected $table='event';
 
-  public  function query(){
-      $data=Db::name($this->table)->select();
-      return $data;
+  public  function query($data){
+      $res=Db::name($this->table)->where('name','like','%'.$data['name'].'%')->page($data['page'].','.$data['pageSize'])->select(); 
+      return $res;
   }
   /**
    * 创建时间

@@ -2,6 +2,7 @@
 namespace app\index\controller;
 use app\index\model\Event as eventModel;
 use think\Log;
+use think\Config;
 class Event extends BaseCheckAuth
 {
 	protected $eventModel;
@@ -19,7 +20,33 @@ class Event extends BaseCheckAuth
      */
  public function query()
     {
-        return json_encode($this->adminInfo);
+        //接受json
+        $res_data=request()->post();
+        //判断是否有data数据,判断数据是否为空
+        if(checkData($res_data,'data')){
+            $data=$res_data['data'];
+            //判断page 参数是否正确
+            if(!checkData($data,'page',0,1)){
+                $page = 1;
+            }
+            $new_data['page'] = $data['page'];
+            //判断查询name的关键字
+            if(!checkData($data,'name')){
+                return returnJson("10013");
+            }
+            $new_data['name'] = $data['name'];
+            $new_data['pageSize'] = Config::get("render.pageSize");
+            $res = $this->eventModel->query($new_data);
+            if(count($res)==0){
+                $map['total'] = 0;
+                $map['list'] = [];   
+            }else{
+                $map['total'] = count($res);
+                $map['list'] = $res;
+            }
+            return returnJson("2000",$map);
+        }
+        return returnJson("2001");
     }
     /*
      * 事件添加

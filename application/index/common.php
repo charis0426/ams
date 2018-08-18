@@ -19,7 +19,7 @@ function returnJson($code,$data=null){
  *num=1 表示该参数可以为空 =0表示必须不为空
  * 
  */
-function checkData($data,$key,$num=0){
+function checkData($data,$key,$num=0,$type=0){
 	if(!isset($data[$key])){
 		return false;
 	}
@@ -30,6 +30,12 @@ function checkData($data,$key,$num=0){
 		return true;
 	}
 	else if(isset($data[$key])&&empty($data[$key])&&$num==0){
+		return false;
+	}
+	else if(isset($data[$key])&&is_numeric($data[$key])&&$type==0){
+		return false;
+	}
+	else if(isset($data[$key])&&!is_numeric($data[$key])&&$type==1){
 		return false;
 	}
 	return true;
