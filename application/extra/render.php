@@ -12,5 +12,12 @@
 return [
 	//jwt加密指定key值
 	"key"=>"ams1234567890",
-	"pageSize"=>"1"
+	"pageSize"=>"1",
+    //聚合数据短信接口地址
+    "messageApi"=>"http://v.juhe.cn/sms/send",
+    //短信api模板id
+    'messageId'=>'96186',
+    //短信api开发者key
+    'messageKey'=>'3eac1ebd7d177a4b21a58d4c613e0d29'
+
 ];

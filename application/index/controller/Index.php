@@ -5,6 +5,8 @@ use app\index\model\Index as indexModel;
 use app\index\model\FileResourceTag as file;
 use think\Session;
 use think\Log;
+use think\Config;
+use app\common\apiClient as api;
 class Index extends Base
 {
 
@@ -105,12 +107,35 @@ class Index extends Base
 
 
     /*
-     * 测试查询方法
+     * 获取验证码
      *
      */
-    public function query()
-    {   $member=new indexModel();
-        return json_encode($member->query());
+    public function getCode()
+    {
+        //接受json数据
+        $res_data=request()->post();
+        if(checkData($res_data,'data')) {
+            $data=$res_data['data'];
+            //检测手机号码是否为空
+            if(!checkData($data,'phone','',1)){
+                return returnJson("10018");
+            }
+            $phone = $data['phone'];
+            //随机生成6位验证码
+            $randCode = rand(100000,999999);
+            $param = array(
+                'mobile' => $phone,
+                'tpl_id' => Config::get("render.messageId"),
+                'tpl_value' => '#code#='.$randCode,
+                'key' => Config::get("render.messageKey"),
+                'dtype' => 'json'
+            );
+            $api_url = Config::get("render.messageApi");
+            $rest = new api($api_url, $param, 'post');
+            $info = $rest->doRequest();
+            return $info;
+        }
+        return returnJson("2001");
     }
     /*
          * 测试插入数据方法
