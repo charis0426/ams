@@ -5,7 +5,7 @@ use app\index\model\Index as indexModel;
 use app\index\model\FileResourceTag as file;
 use think\Session;
 use think\Log;
-use think\Config;
+use think\Cache;
 use app\common\apiClient as api;
 class Index extends Base
 {
@@ -121,9 +121,15 @@ class Index extends Base
                 return returnJson("10018");
             }
             $phone = $data['phone'];
+            //判断手机是否被绑定
             //随机生成6位验证码
             $randCode = rand(100000,999999);
-            $param = array(
+            //session保存验证码和手机号
+            Session_start();
+            $sessionId = session_id();
+            Session::set('bdCode',$randCode,3600);
+            Session::set('bdPhone',$phone,3600);
+            /*$param = array(
                 'mobile' => $phone,
                 'tpl_id' => Config::get("render.messageId"),
                 'tpl_value' => '#code#='.$randCode,
@@ -132,8 +138,78 @@ class Index extends Base
             );
             $api_url = Config::get("render.messageApi");
             $rest = new api($api_url, $param, 'post');
-            $info = $rest->doRequest();
-            return $info;
+            $info = $rest->doRequest();*/
+            $info['error_code']=0;
+            $info['code']=$randCode;
+            $info['sessionId']=$sessionId;
+            return json_encode($info);
+        }
+        return returnJson("2001");
+    }
+
+    /*
+     * 绑定手机验证
+     *
+    */
+    public function checkBdCode(){
+        //接受json数据
+        $res_data=request()->post();
+        if(checkData($res_data,'data')) {
+            $data=$res_data['data'];
+            //验证验证码是否传值
+            if(!checkData($data,'code','',1)){
+                return returnJson("10019");
+            }
+            $code = $data['code'];
+            //验证是否传递了微信个人信息nickName,avatarUrl,city,country,gender,language,province
+            if(!checkData($data,'nickName',1)){
+                return returnJson("10011");
+            }
+            $new_data['userName'] = $data['nickName'];
+            if(!checkData($data,'avatarUrl',1)){
+                return returnJson("10012");
+            }
+            $new_data['avatarUrl'] = $data['avatarUrl'];
+            if(!checkData($data,'city',1)){
+                return returnJson("10013");
+            }
+            $new_data['city'] = $data['city'];
+            if(!checkData($data,'country',1)){
+                return returnJson("10014");
+            }
+            $new_data['country'] = $data['country'];
+            if(!checkData($data,'gender','',1)){
+                return returnJson("10015");
+            }
+            $new_data['gender'] = $data['gender'];
+            if(!checkData($data,'language',1)){
+                return returnJson("10016");
+            }
+            $new_data['language'] = $data['language'];
+            if(!checkData($data,'province',1)){
+                return returnJson("10020");
+            }
+            $new_data['province'] = $data['province'];
+            //验证验证码是否正确
+            $cookie = request()->header('Cookie');
+            if($cookie!=''){
+                session_id($cookie);
+            }
+            session_start();
+            echo Session::get("bdCode");die;
+            if($code != Session::get("bdCode")){
+                return returnJson("10021");
+            }
+            $new_data['phone'] = Cache::get("bdPhone");
+            $new_data['password'] = parent::getPassHash("123456");
+            $new_data['lastLoginTime'] = time();
+            $new_data['createTime'] = time();
+            //往数据库加用户
+            $res=$this->indexModel->add($new_data);
+            if($res==1){
+                return returnJson("2000");
+            }
+            return returnJson("3001");
         }
         return returnJson("2001");
     }
@@ -172,6 +248,27 @@ class Index extends Base
     {   $user = file::get(1);
         $user->delete();
         return  '删除成功。删除ID为:' . $user->id;
+    }
+    public function test()
+    {   session_id('bsr1im9a28fdie9hbn92ioh2r1');
+        session_start();//这个函数必须在session_id()之后
+        echo Session::get('bdCode');
+        die;
+        return json_encode(session());
+    }
+    public function test1()
+    {
+        //生成第三方3rd_session
+        $session3rd  = null;
+        $strPol = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+        $max = strlen($strPol)-1;
+        for($i=0;$i<16;$i++){
+            $session3rd .=$strPol[rand(0,$max)];
+        }
+        session_start($session3rd);
+        Session::set('name','zhangsan');
+        return json_encode($session3rd);
+
     }
 }
 

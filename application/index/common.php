@@ -12,7 +12,22 @@ function returnJson($code,$data=null){
 		$map['data']=$data;
 	}
     return json_encode($map); 
-} 
+}
+/*
+ *
+ *生成sessionid
+ *
+ */
+function createSessionId(){
+    //生成第三方sessionId
+    $sessionId  = null;
+    $strPol = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+    $max = strlen($strPol)-1;
+    for($i=0;$i<16;$i++){
+        $sessionId .=$strPol[rand(0,$max)];
+    }
+    return $sessionId;
+}
 /*
  *
  *判断请求参数是否合法

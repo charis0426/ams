@@ -18,6 +18,6 @@ return [
     //短信api模板id
     'messageId'=>'96186',
     //短信api开发者key
-    'messageKey'=>'3eac1ebd7d177a4b21a58d4c613e0d29'
+    'messageKey'=>'5eac1ebd7d177a4b21a58d4c613e0d29'
 
 ];

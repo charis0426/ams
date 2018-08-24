@@ -18,7 +18,6 @@ class CheckAuth
     public function run(&$params){
     	//获取token和用户id
     	$token = request()->header('x-Tokend');
-        
         //验证请求方法是否合法
         if(!IS_POST){
             exit(returnJson("2002"));
