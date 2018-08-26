@@ -3,7 +3,7 @@ namespace app\index\controller;
 use app\index\model\FileResourceTag;
 use app\index\model\Index as indexModel;
 use app\index\model\FileResourceTag as file;
-use think\Session;
+use think\Config;
 use think\Log;
 use think\Cache;
 use app\common\apiClient as api;
@@ -35,7 +35,7 @@ class Index extends Base
                 return returnJson("1006");
             }
             $userName = $data['userName'];
-            if(!checkData($data,'password')){
+            if(!checkData($data,'password',1,1)){
                 return returnJson("1007");
             }
             $password = $data['password'];
@@ -121,14 +121,18 @@ class Index extends Base
                 return returnJson("10018");
             }
             $phone = $data['phone'];
+            //检测微信登录的code
+            if(!checkData($data,'code')){
+                return returnJson("3002");
+            }
+            $code = $data['code'];
             //判断手机是否被绑定
             //随机生成6位验证码
             $randCode = rand(100000,999999);
             //session保存验证码和手机号
-            Session_start();
-            $sessionId = session_id();
-            Session::set('bdCode',$randCode,3600);
-            Session::set('bdPhone',$phone,3600);
+            $redisDate['bdCode'] = $randCode;
+            $redisDate['bdPhone'] = $phone;
+            Cache::set($code,$redisDate,3600); 
             /*$param = array(
                 'mobile' => $phone,
                 'tpl_id' => Config::get("render.messageId"),
@@ -141,7 +145,7 @@ class Index extends Base
             $info = $rest->doRequest();*/
             $info['error_code']=0;
             $info['code']=$randCode;
-            $info['sessionId']=$sessionId;
+            $info['sessionId']=$code;
             return json_encode($info);
         }
         return returnJson("2001");
@@ -191,25 +195,39 @@ class Index extends Base
             }
             $new_data['province'] = $data['province'];
             //验证验证码是否正确
-            $cookie = request()->header('Cookie');
-            if($cookie!=''){
-                session_id($cookie);
+            $sessionId = request()->header('Cookie');
+            if($sessionId == ''){
+                return returnJson("3002");
             }
-            session_start();
-            echo Session::get("bdCode");die;
-            if($code != Session::get("bdCode")){
+            $cookie = Cache::get($sessionId);
+            if($code != $cookie['bdCode']){
                 return returnJson("10021");
             }
-            $new_data['phone'] = Cache::get("bdPhone");
+            //判断该手机是否已经被绑定
+            $count_res = $this->indexModel->isBdByPhone($cookie['bdPhone']);
+            if($count_res >0){
+                return returnJson("10022");
+            }
+            //通过code换取session_key和openId
+            $arr = parent::getWeixinInfo($sessionId);
+            $openid = $arr['openid'];
+            $session_key = $arr['session_key'];
+            $new_data['openId'] = $openid;
+            $new_data['phone'] = $cookie['bdPhone'];
             $new_data['password'] = parent::getPassHash("123456");
             $new_data['lastLoginTime'] = time();
             $new_data['createTime'] = time();
             //往数据库加用户
             $res=$this->indexModel->add($new_data);
-            if($res==1){
-                return returnJson("2000");
+            if($res<=0){
+                return returnJson("3001");
             }
-            return returnJson("3001");
+            //存入数据库后，把微信的数据存入到jwt,默认绑定后自动登录
+            //生成token
+            $token = parent::createToken($new_data);
+            //返回json
+            $map['token'] = $token;
+            return returnJson("2000",$map);
         }
         return returnJson("2001");
     }

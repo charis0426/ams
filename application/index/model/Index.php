@@ -23,12 +23,17 @@ class Index extends Model
   }
   //添加用户，注册
   public function add($data){
-    $res = DB::table($this->table)->insert($data);
+    $res = DB::table($this->table)->insertGetId($data);
     return $res;
   }
   //更新数据库登录时间
   public function updateLoginInfo($time,$id){
     $res = DB::table($this->table)->where('id', $id)->update(['lastLoginTime' => $time]);
     return $res;
+  }
+  //根据手机号码查询是否已经被绑定
+  public function isBdByPhone($mobile){
+      $count = DB::table($this->table)->where('phone',$mobile)->count();
+      return $count;
   }
 }

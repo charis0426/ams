@@ -4,6 +4,7 @@ namespace app\index\controller;
 use think\Controller;
 use firebase\JWT\JWT;
 use think\Config;
+use app\common\apiClient as api;
 
 /*
  *
@@ -37,14 +38,27 @@ class Base extends Controller
 	 */
 	public function createToken($data){
 		$key = Config::get("render.key");
-		$token = array(
-		'id' => $data['id'],
-		'userName' => $data['userName'],
-		'phone'=>$data['phone'],
-		'lastLoginTime'=>$data['lastLoginTime']
-		);
-
-		$jwt= JWT::encode($token, $key);
+		$jwt= JWT::encode($data, $key);
 		return $jwt;
+	}
+	/*
+	 *
+	 * 微信API 换取openid
+	 * 
+	 */
+	public function getWeixinInfo($code){
+	 	$weixin['js_code'] = $code;
+        $weixin['appid'] = Config::get("render.appid");
+        $weixin['secret'] = Config::get("render.appSecret");
+        $weixin['grant_type'] = Config::get("render.grant_type");
+        $api_url = Config::get("render.weixin");
+        $rest = new api($api_url, $weixin, 'get');
+        $info = $rest->doRequest();
+        $json = json_decode($info);//对json数据解码
+        $arr = get_object_vars($json);
+        if(!checkData($arr,'openid')||!checkData($arr,'session_key')){
+            exit(returnJson("3002"));
+        }
+        return $arr;
 	}
 }
