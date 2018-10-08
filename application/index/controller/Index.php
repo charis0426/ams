@@ -133,7 +133,7 @@ class Index extends Base
             $redisDate['bdCode'] = $randCode;
             $redisDate['bdPhone'] = $phone;
             Cache::set($code,$redisDate,3600); 
-            /*$param = array(
+            $param = array(
                 'mobile' => $phone,
                 'tpl_id' => Config::get("render.messageId"),
                 'tpl_value' => '#code#='.$randCode,
@@ -142,10 +142,10 @@ class Index extends Base
             );
             $api_url = Config::get("render.messageApi");
             $rest = new api($api_url, $param, 'post');
-            $info = $rest->doRequest();*/
-            $info['error_code']=0;
-            $info['code']=$randCode;
-            $info['sessionId']=$code;
+            $info = $rest->doRequest();
+            // $info['error_code']=0;
+            // $info['code']=$randCode;
+            // $info['sessionId']=$code;
             return json_encode($info);
         }
         return returnJson("2001");
@@ -231,6 +231,36 @@ class Index extends Base
         }
         return returnJson("2001");
     }
+    /*
+     *检测是否已经绑定，判断登录状态
+     * 
+     */
+    public function checkBd(){
+        //接受json数据
+        $res_data=request()->post();
+        if(checkData($res_data,'data')) {
+            $data=$res_data['data'];
+        }
+        //验证code是否传值小程序的code
+        if(!checkData($data,'code',1)){
+            return returnJson("3003");
+        }
+        $code = $data['code'];
+        //通过code换取session_key和openId
+        $arr = parent::getWeixinInfo($code);
+        $openid = $arr['c'];
+        $session_key = $arr['session_key'];
+        //检测是否已经被绑定
+        $res = $this->indexModel->checkBd($openid);
+        // if($res != null){
+        //     //被绑定就自动将用户信息，返回，实现登陆
+        //     return 0;
+        // }else if{
+        //     return 0;
+        // }
+
+    } 
+
     /*
          * 测试插入数据方法
          *

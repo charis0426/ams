@@ -36,4 +36,10 @@ class Index extends Model
       $count = DB::table($this->table)->where('phone',$mobile)->count();
       return $count;
   }
+  //检测是否被绑定
+  public function checkBd($openId){
+      $data = DB::table($this->table)->where('openId',$openId)->find();
+      return $data;
+  }
+
 }
