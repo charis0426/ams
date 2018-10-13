@@ -133,19 +133,19 @@ class Index extends Base
             $redisDate['bdCode'] = $randCode;
             $redisDate['bdPhone'] = $phone;
             Cache::set($code,$redisDate,3600); 
-            $param = array(
-                'mobile' => $phone,
-                'tpl_id' => Config::get("render.messageId"),
-                'tpl_value' => '#code#='.$randCode,
-                'key' => Config::get("render.messageKey"),
-                'dtype' => 'json'
-            );
-            $api_url = Config::get("render.messageApi");
-            $rest = new api($api_url, $param, 'post');
-            $info = $rest->doRequest();
-            // $info['error_code']=0;
-            // $info['code']=$randCode;
-            // $info['sessionId']=$code;
+            // $param = array(
+            //     'mobile' => $phone,
+            //     'tpl_id' => Config::get("render.messageId"),
+            //     'tpl_value' => '#code#='.$randCode,
+            //     'key' => Config::get("render.messageKey"),
+            //     'dtype' => 'json'
+            // );
+            // $api_url = Config::get("render.messageApi");
+            // $rest = new api($api_url, $param, 'post');
+            // $info = $rest->doRequest();
+            $info['error_code']=0;
+            $info['code']=$randCode;
+            $info['sessionId']=$code;
             return json_encode($info);
         }
         return returnJson("2001");
@@ -248,16 +248,16 @@ class Index extends Base
         $code = $data['code'];
         //通过code换取session_key和openId
         $arr = parent::getWeixinInfo($code);
-        $openid = $arr['c'];
-        $session_key = $arr['session_key'];
+        $openid = $arr['openid'];
+        //$session_key = $arr['session_key'];
         //检测是否已经被绑定
         $res = $this->indexModel->checkBd($openid);
-        // if($res != null){
-        //     //被绑定就自动将用户信息，返回，实现登陆
-        //     return 0;
-        // }else if{
-        //     return 0;
-        // }
+        if($res != null){
+            //被绑定就自动将用户信息，返回，实现登陆
+            return returnJson("3003",$res);
+        }else{
+            return returnJson("3004",$res);
+        }
 
     } 
 
